@@ -453,7 +453,7 @@ impl OpenAIAdapter {
 							// go back verbatim: a signed or encrypted block cannot be rebuilt from
 							// the plaintext, and the gateway requires the original sequence.
 							ContentPart::Custom(custom) if is_reasoning_detail(&custom) => {
-								reasoning_details.push(custom.data)
+								reasoning_details.push(custom.data.into())
 							}
 							// Other Custom parts are ignored for this logic
 							ContentPart::Custom(_) => {}

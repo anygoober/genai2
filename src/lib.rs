@@ -25,6 +25,9 @@ pub mod webc;
 #[cfg(feature = "otel")]
 pub mod otel;
 
+// -- rkyv specifics
+pub mod rkyv_compat;
+
 // endregion: --- Modules
 
 // region:    --- TLS Backend Guard

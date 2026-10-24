@@ -5,6 +5,7 @@ use serde_with::skip_serializing_none;
 /// Response produced by a tool invocation, paired with the originating tool call ID.
 #[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
 pub struct ToolResponse {
 	/// Identifier of the originating tool call.
 	pub call_id: String,

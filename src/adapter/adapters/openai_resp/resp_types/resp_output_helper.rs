@@ -38,7 +38,7 @@ impl ContentPart {
 				let tool_call = ToolCall {
 					call_id,
 					fn_name,
-					fn_arguments,
+					fn_arguments: fn_arguments.into(),
 					thought_signatures: None,
 				};
 
@@ -52,7 +52,7 @@ impl ContentPart {
 					ToolCall {
 						call_id,
 						fn_name,
-						fn_arguments: Value::String(input),
+						fn_arguments: Value::String(input).into(),
 						thought_signatures: None,
 					}
 					.into(),
@@ -144,7 +144,7 @@ mod tests {
 		assert_eq!(call.fn_name, "apply_patch");
 		assert_eq!(
 			call.fn_arguments,
-			Value::String("*** Begin Patch\n*** End Patch\n".to_string())
+			Value::String("*** Begin Patch\n*** End Patch\n".to_string()).into()
 		);
 	}
 }

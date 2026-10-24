@@ -349,7 +349,7 @@ impl GeminiAdapter {
 				GeminiPartData::ToolCall(ToolCall {
 					call_id,
 					fn_name,
-					fn_arguments: fc.x_get("args").unwrap_or(Value::Null),
+					fn_arguments: fc.x_get("args").unwrap_or(Value::Null).into(),
 					thought_signatures: thought_signature.clone().map(|signature| vec![signature]),
 				})
 			} else if let Some(text) = take_string(&mut part, "text") {
@@ -916,7 +916,7 @@ impl GeminiModelPart {
 						data: GeminiModelPartData::FunctionCall {
 							id: gemini_call_id(&call.call_id).map(str::to_string),
 							name: call.fn_name,
-							args: call.fn_arguments,
+							args: call.fn_arguments.into(),
 						},
 						thought_signature,
 					});

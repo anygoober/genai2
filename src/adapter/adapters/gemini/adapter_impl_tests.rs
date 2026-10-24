@@ -438,7 +438,7 @@ fn call(path: &str) -> ToolCall {
 	ToolCall {
 		call_id: format!("call#read_file#{path}"),
 		fn_name: "read_file".to_string(),
-		fn_arguments: json!({"path": path}),
+		fn_arguments: json!({"path": path}).into(),
 		thought_signatures: None,
 	}
 }
@@ -632,7 +632,7 @@ fn signed_call(name: &str, signature: Option<&str>) -> ToolCall {
 	ToolCall {
 		call_id: format!("call#{name}#0"),
 		fn_name: name.to_string(),
-		fn_arguments: json!({}),
+		fn_arguments: json!({}).into(),
 		thought_signatures: signature.map(|s| vec![s.to_string()]),
 	}
 }

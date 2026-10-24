@@ -6,6 +6,7 @@ use serde_with::skip_serializing_none;
 /// A chat message with a role, multipart content, and optional per-message settings.
 #[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
 pub struct ChatMessage {
 	/// The message role.
 	pub role: ChatRole,
@@ -108,6 +109,7 @@ impl ChatMessage {
 /// Per-message options (e.g., cache control).
 #[skip_serializing_none]
 #[derive(Debug, Clone, Default, Serialize, Deserialize, From)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
 pub struct MessageOptions {
 	#[from]
 	/// Per-provider cache behavior hint.
@@ -127,6 +129,7 @@ impl MessageOptions {
 /// Provider support and request or message-level mapping vary. When mixing ephemeral
 /// TTLs, longer-lived entries must precede shorter-lived entries in request order.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
 pub enum CacheControl {
 	/// Default ephemeral cache (5 minutes TTL).
 	Ephemeral,
@@ -162,6 +165,7 @@ impl From<CacheControl> for MessageOptions {
 
 /// Chat roles recognized across providers.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, derive_more::Display)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
 #[allow(missing_docs)]
 pub enum ChatRole {
 	System,
@@ -232,13 +236,13 @@ mod tests {
 			ToolCall {
 				call_id: "call-1".to_string(),
 				fn_name: "first".to_string(),
-				fn_arguments: json!({}),
+				fn_arguments: json!({}).into(),
 				thought_signatures: Some(vec!["sig-1a".to_string(), "sig-1b".to_string()]),
 			},
 			ToolCall {
 				call_id: "call-2".to_string(),
 				fn_name: "second".to_string(),
-				fn_arguments: json!({}),
+				fn_arguments: json!({}).into(),
 				thought_signatures: Some(vec!["sig-2".to_string()]),
 			},
 		]

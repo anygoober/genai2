@@ -3,14 +3,15 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use value_ext::JsonValueExt as _;
 
-use crate::{ModelIden, adapter::AdapterKind};
+use crate::{ModelIden, adapter::AdapterKind, rkyv_compat::JsonValue};
 
 /// Custom Content Part containing the raw json value of that part from the provider/model
 /// `.model_iden` will always be captured if this is part of a response
 #[derive(Debug, Clone, Serialize, Deserialize, From)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
 pub struct CustomPart {
 	pub model_iden: Option<ModelIden>,
-	pub data: Value,
+	pub data: JsonValue,
 }
 
 impl CustomPart {

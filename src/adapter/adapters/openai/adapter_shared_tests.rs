@@ -21,7 +21,7 @@ fn test_cache_control_without_eligible_content_does_not_fail_chat_completion() -
 	let assistant_msg = ChatMessage::assistant(MessageContent::from_parts(vec![ContentPart::ToolCall(ToolCall {
 		call_id: "call_1".to_string(),
 		fn_name: "get_weather".to_string(),
-		fn_arguments: json!({}),
+		fn_arguments: json!({}).into(),
 		thought_signatures: None,
 	})]))
 	.with_options(CacheControl::Ephemeral);
@@ -126,7 +126,7 @@ fn test_reasoning_content_serialized_on_assistant_message() -> Result<()> {
 	let tool_call = ToolCall {
 		call_id: "call_1".to_string(),
 		fn_name: "get_weather".to_string(),
-		fn_arguments: serde_json::json!({"city": "Paris"}),
+		fn_arguments: serde_json::json!({"city": "Paris"}).into(),
 		thought_signatures: None,
 	};
 
@@ -203,7 +203,7 @@ fn test_reasoning_details_echoed_verbatim_on_assistant_message() -> Result<()> {
 	let tool_call = ToolCall {
 		call_id: "call_1".to_string(),
 		fn_name: "read_file".to_string(),
-		fn_arguments: json!({"path": "/runbook"}),
+		fn_arguments: json!({"path": "/runbook"}).into(),
 		thought_signatures: None,
 	};
 	let assistant_msg = ChatMessage::assistant(MessageContent::from_parts(vec![

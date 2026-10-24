@@ -129,7 +129,7 @@ async fn print_chat_stream_inner(
 							(
 								Some(format!(
 									"\n-- ChatStreamEvent::ToolCallChunk: fn: {}, args: {}\n",
-									tool_chunk.tool_call.fn_name, tool_chunk.tool_call.fn_arguments
+									tool_chunk.tool_call.fn_name, *tool_chunk.tool_call.fn_arguments
 								)),
 								None,
 								false,

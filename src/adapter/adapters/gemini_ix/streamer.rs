@@ -182,7 +182,7 @@ impl futures::Stream for GeminiIxStreamer {
 								let tool_call = ToolCall {
 									call_id,
 									fn_name,
-									fn_arguments: Value::Null,
+									fn_arguments: Value::Null.into(),
 									thought_signatures: None,
 								};
 								self.in_progress_tool_calls.insert(index, (tool_call, String::new()));
@@ -255,7 +255,7 @@ impl futures::Stream for GeminiIxStreamer {
 									);
 									Value::String(args_buffer.clone())
 								})
-							};
+							}.into();
 
 							if self.options.capture_tool_calls {
 								let is_first = self.captured_data.tool_calls.as_ref().is_none_or(Vec::is_empty);

@@ -107,7 +107,7 @@ impl OpenAIStreamer {
 		let tool_call = ToolCall {
 			call_id: call_id.clone(),
 			fn_name: fn_name.clone(),
-			fn_arguments: Value::String(arguments.clone()),
+			fn_arguments: Value::String(arguments.clone()).into(),
 			thought_signatures: None,
 		};
 
@@ -121,7 +121,7 @@ impl OpenAIStreamer {
 			// Merge with existing: accumulate arguments as strings
 			if let Some(existing_args) = existing_call.fn_arguments.as_str() {
 				let accumulated = format!("{existing_args}{arguments}");
-				existing_call.fn_arguments = Value::String(accumulated);
+				existing_call.fn_arguments = Value::String(accumulated).into();
 			}
 			// Update call_id and fn_name on first chunk that has them
 			if !fn_name.is_empty() {
@@ -232,11 +232,11 @@ impl futures::Stream for OpenAIStreamer {
 									let ToolCall {
 										call_id,
 										fn_name,
-										fn_arguments,
+										mut fn_arguments,
 										..
 									} = tool_call;
 									// parse fn_arguments if needed
-									let fn_arguments = match fn_arguments {
+									let fn_arguments = match fn_arguments.take() {
 										Value::String(fn_arguments_string) => {
 											// NOTE: Here we are resilient for now, if we cannot parse, just return the original String
 											match serde_json::from_str::<Value>(&fn_arguments_string) {
@@ -244,13 +244,13 @@ impl futures::Stream for OpenAIStreamer {
 												Err(_) => Value::String(fn_arguments_string),
 											}
 										}
-										_ => fn_arguments,
+										_ => fn_arguments.take(),
 									};
 
 									ToolCall {
 										call_id,
 										fn_name,
-										fn_arguments,
+										fn_arguments: fn_arguments.into(),
 										thought_signatures: None,
 									}
 								})

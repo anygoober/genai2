@@ -9,6 +9,7 @@ use derive_more::Display;
 /// This struct represents the association between an adapter kind
 /// and a model name, allowing for easy conversion and instantiation.
 #[derive(Clone, Debug, Serialize, Deserialize, Display, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
 #[display("{model_name} (adapter: {adapter_kind})")]
 pub struct ModelIden {
 	/// The adapter kind.

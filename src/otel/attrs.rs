@@ -113,7 +113,7 @@ fn part_value(part: &ContentPart) -> Option<Value> {
 			"type": "tool_call",
 			"id": tc.call_id,
 			"name": tc.fn_name,
-			"arguments": tc.fn_arguments,
+			"arguments": tc.fn_arguments.into(),
 		})),
 		ContentPart::ToolResponse(tr) => Some(json!({
 			"type": "tool_call_response",

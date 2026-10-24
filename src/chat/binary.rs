@@ -7,6 +7,7 @@ use std::sync::Arc;
 /// Binary payload attached to a message (e.g., image or PDF).
 #[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
 pub struct Binary {
 	/// MIME type, such as "image/png" or "application/pdf".
 	pub content_type: String,
@@ -152,6 +153,7 @@ impl Binary {
 
 /// Origin of a binary payload.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
 pub enum BinarySource {
 	/// For models/services that support URL as input
 	/// NOTE: Few AI services support this.

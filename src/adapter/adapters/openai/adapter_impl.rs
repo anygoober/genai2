@@ -288,7 +288,7 @@ fn parse_tool_call(raw_tool_call: Value) -> Result<ToolCall> {
 	Ok(ToolCall {
 		call_id: iterim.id,
 		fn_name,
-		fn_arguments,
+		fn_arguments: fn_arguments.into(),
 		thought_signatures: None,
 	})
 }

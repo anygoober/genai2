@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// Transparent wrapper around a list of ContentPart (Text, Binary, ToolCall, or ToolResponse).
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
 #[serde(transparent)]
 pub struct MessageContent {
 	/// The parts that compose this message.

@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 /// AdapterKind is an enum that represents the different types of adapters that can be used to interact with the API.
 ///
 #[derive(Debug, Clone, Copy, Display, Eq, PartialEq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
 pub enum AdapterKind {
 	/// For OpenAI Chat Completions and also can be used for OpenAI compatible APIs
 	/// NOTE: This adapter share some behavior that other adapters can use while still providing some variant

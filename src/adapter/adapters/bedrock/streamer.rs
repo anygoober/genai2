@@ -263,7 +263,7 @@ impl BedrockStreamer {
 					let tc = ToolCall {
 						call_id: call_id.clone(),
 						fn_name: fn_name.clone(),
-						fn_arguments: Value::String(String::new()),
+						fn_arguments: Value::String(String::new()).into(),
 						thought_signatures: None,
 					};
 					self.in_progress_tool = Some(ToolCallAccumulator {
@@ -290,7 +290,7 @@ impl BedrockStreamer {
 						events.push(InterStreamEvent::ToolCallChunk(ToolCall {
 							call_id: acc.call_id.clone(),
 							fn_name: acc.fn_name.clone(),
-							fn_arguments: Value::String(acc.input.clone()),
+							fn_arguments: Value::String(acc.input.clone()).into(),
 							thought_signatures: None,
 						}));
 					}
@@ -327,7 +327,7 @@ impl BedrockStreamer {
 					let tc = ToolCall {
 						call_id: acc.call_id,
 						fn_name: acc.fn_name,
-						fn_arguments,
+						fn_arguments: fn_arguments.into(),
 						thought_signatures: None,
 					};
 					match self.captured_data.tool_calls {

@@ -473,7 +473,7 @@ mod tests {
 			captured_tool_calls: Some(vec![ToolCall {
 				call_id: "call-1".to_string(),
 				fn_name: "lookup".to_string(),
-				fn_arguments: serde_json::json!({"query": "weather"}),
+				fn_arguments: serde_json::json!({"query": "weather"}).into(),
 				thought_signatures: None,
 			}]),
 			..Default::default()
@@ -499,7 +499,7 @@ mod tests {
 			captured_tool_calls: Some(vec![ToolCall {
 				call_id: "call-1".to_string(),
 				fn_name: "lookup".to_string(),
-				fn_arguments: serde_json::json!({}),
+				fn_arguments: serde_json::json!({}).into(),
 				thought_signatures: Some(vec!["sig-a".to_string()]),
 			}]),
 			..Default::default()

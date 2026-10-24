@@ -187,7 +187,7 @@ impl futures::Stream for AnthropicStreamer {
 										let model_iden = Some(self.options.model_iden.clone());
 										let custom_part = CustomPart {
 											model_iden,
-											data: block,
+											data: block.into(),
 										};
 										self.captured_thought_blocks.push(InterStreamThoughtBlock::Custom(custom_part));
 									}
@@ -201,7 +201,7 @@ impl futures::Stream for AnthropicStreamer {
 									let tc = ToolCall {
 										call_id: id.clone(),
 										fn_name: name.clone(),
-										fn_arguments: Value::String(String::new()),
+										fn_arguments: Value::String(String::new()).into(),
 										thought_signatures: None,
 									};
 
@@ -253,7 +253,7 @@ impl futures::Stream for AnthropicStreamer {
 									let tc = ToolCall {
 										call_id: id.clone(),
 										fn_name: name.clone(),
-										fn_arguments: Value::String(input.clone()),
+										fn_arguments: Value::String(input.clone()).into(),
 										thought_signatures: None,
 									};
 
@@ -525,7 +525,7 @@ impl AnthropicStreamer {
 		let tc = ToolCall {
 			call_id: id,
 			fn_name: name,
-			fn_arguments,
+			fn_arguments: fn_arguments.into(),
 			thought_signatures: None,
 		};
 

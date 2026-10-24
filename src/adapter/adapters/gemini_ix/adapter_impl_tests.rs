@@ -146,7 +146,7 @@ fn test_gemini_ix_tool_roundtrip_builds_ordered_steps() -> Result<()> {
 			ContentPart::ToolCall(ToolCall {
 				call_id: "call_1".to_string(),
 				fn_name: "get_weather".to_string(),
-				fn_arguments: json!({"city": "Chennai"}),
+				fn_arguments: json!({"city": "Chennai"}).into(),
 				thought_signatures: None,
 			}),
 		]),
@@ -196,7 +196,7 @@ fn test_gemini_ix_tool_call_signature_emits_its_thought_step() -> Result<()> {
 		content: MessageContent::from_parts(vec![ContentPart::ToolCall(ToolCall {
 			call_id: "call_1".to_string(),
 			fn_name: "get_weather".to_string(),
-			fn_arguments: json!({"city": "Chennai"}),
+			fn_arguments: json!({"city": "Chennai"}).into(),
 			thought_signatures: Some(vec!["sig-from-tool-call".to_string()]),
 		})]),
 		options: None,
@@ -227,7 +227,7 @@ fn test_gemini_ix_thought_signature_is_not_emitted_twice() -> Result<()> {
 			ContentPart::ToolCall(ToolCall {
 				call_id: "call_1".to_string(),
 				fn_name: "get_weather".to_string(),
-				fn_arguments: json!({}),
+				fn_arguments: json!({}).into(),
 				// This is exactly the shape `to_chat_response` produces.
 				thought_signatures: Some(vec!["sig-abc".to_string()]),
 			}),
@@ -258,7 +258,7 @@ fn test_gemini_ix_unsigned_tool_call_uses_the_skip_sentinel() -> Result<()> {
 		content: MessageContent::from_parts(vec![ContentPart::ToolCall(ToolCall {
 			call_id: "call_1".to_string(),
 			fn_name: "get_weather".to_string(),
-			fn_arguments: json!({}),
+			fn_arguments: json!({}).into(),
 			thought_signatures: None,
 		})]),
 		options: None,
@@ -320,7 +320,7 @@ fn test_gemini_ix_function_result_name_resolves_from_the_call() -> Result<()> {
 		content: MessageContent::from_parts(vec![ContentPart::ToolCall(ToolCall {
 			call_id: "call_1".to_string(),
 			fn_name: "get_weather".to_string(),
-			fn_arguments: json!({"city": "Chennai"}),
+			fn_arguments: json!({"city": "Chennai"}).into(),
 			thought_signatures: Some(vec!["sig-abc".to_string()]),
 		})]),
 		options: None,

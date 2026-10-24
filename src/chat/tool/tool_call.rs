@@ -1,11 +1,13 @@
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use serde_with::skip_serializing_none;
+
+use crate::rkyv_compat::JsonValue;
 
 /// The tool call function name and arguments sent back by the LLM.
 /// Represents a single function/tool invocation emitted by the model.
 #[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
 pub struct ToolCall {
 	/// Stable identifier for this tool call (used to correlate tool responses).
 	pub call_id: String,
@@ -15,7 +17,7 @@ pub struct ToolCall {
 
 	/// JSON arguments payload as provided by the model.
 	/// Kept as `serde_json::Value` so callers can deserialize into their own types.
-	pub fn_arguments: Value,
+	pub fn_arguments: JsonValue,
 
 	/// Thought signatures associated with this tool call.
 	///

@@ -108,7 +108,7 @@ impl<S> OllamaStreamer<S> {
 				tcs.push(ToolCall {
 					call_id,
 					fn_name,
-					fn_arguments,
+					fn_arguments: fn_arguments.into(),
 					thought_signatures: None,
 				});
 			}
@@ -365,11 +365,11 @@ mod tests {
 		let InterStreamEvent::ToolCallChunk(tc_a) = &events[1] else {
 			panic!("expected ToolCallChunk, got {:?}", events[1]);
 		};
-		assert_eq!(tc_a.fn_arguments, json!({"city": "Paris"}));
+		assert_eq!(tc_a.fn_arguments, json!({"city": "Paris"}).into());
 		let InterStreamEvent::ToolCallChunk(tc_b) = &events[2] else {
 			panic!("expected second ToolCallChunk, got {:?}", events[2]);
 		};
-		assert_eq!(tc_b.fn_arguments, json!({}));
+		assert_eq!(tc_b.fn_arguments, json!({}).into());
 
 		Ok(())
 	}

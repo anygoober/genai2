@@ -189,7 +189,7 @@ fn test_assistant_thinking_signature_serializes_before_tool_use() {
 	let tool_call = ToolCall {
 		call_id: "call-1".to_string(),
 		fn_name: "get_weather".to_string(),
-		fn_arguments: json!({"city": "Cairo", "unit": "C"}),
+		fn_arguments: json!({"city": "Cairo", "unit": "C"}).into(),
 		thought_signatures: Some(vec!["opaque-signature".to_string()]),
 	};
 	let assistant =
@@ -376,7 +376,7 @@ fn test_assistant_custom_thinking_blocks_keep_their_order() {
 		ContentPart::ToolCall(ToolCall {
 			call_id: "call-1".to_string(),
 			fn_name: "lookup".to_string(),
-			fn_arguments: json!({}),
+			fn_arguments: json!({}).into(),
 			thought_signatures: None,
 		}),
 	]));
@@ -435,7 +435,7 @@ fn test_assistant_unpaired_thinking_metadata_is_dropped() {
 		ContentPart::ToolCall(ToolCall {
 			call_id: "call-1".to_string(),
 			fn_name: "get_weather".to_string(),
-			fn_arguments: json!({}),
+			fn_arguments: json!({}).into(),
 			thought_signatures: None,
 		})
 	}

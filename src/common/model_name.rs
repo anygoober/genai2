@@ -3,14 +3,18 @@ use std::sync::Arc;
 
 use serde::{Deserialize, Deserializer, Serialize};
 
+use crate::rkyv_compat::StaticStr;
+
 /// Store a model name with or without namespace
 /// e.g. `gemini-3-flash-preview` or `gemini::gemini-3-flash-preview`
 #[derive(Clone, Debug, Serialize, Hash, Eq, PartialEq)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
 pub struct ModelName(Inner);
 
 #[derive(Clone, Debug, Serialize, Hash, Eq, PartialEq)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
 enum Inner {
-	Static(&'static str),
+	Static(StaticStr),
 	Shared(Arc<str>),
 }
 
@@ -31,14 +35,14 @@ impl ModelName {
 	}
 
 	pub fn from_static(name: &'static str) -> Self {
-		Self(Inner::Static(name))
+		Self(Inner::Static(name.into()))
 	}
 }
 
 impl ModelName {
 	pub fn as_str(&self) -> &str {
 		match self.0 {
-			Inner::Static(s) => s,
+			Inner::Static(ref s) => s,
 			Inner::Shared(ref s) => s,
 		}
 	}

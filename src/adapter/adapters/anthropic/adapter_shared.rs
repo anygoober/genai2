@@ -251,7 +251,7 @@ impl AnthropicAdapter {
 								}
 								ContentPart::ThoughtSignature(_) => {}
 								ContentPart::ReasoningContent(_) => {}
-								ContentPart::Custom(custom_part) => values.push(custom_part.data),
+								ContentPart::Custom(custom_part) => values.push(custom_part.data.into()),
 							}
 						}
 						let values = apply_cache_control_to_parts(cache_control.as_ref(), values);
@@ -280,7 +280,7 @@ impl AnthropicAdapter {
 							}
 							ContentPart::ReasoningContent(reasoning) => reasoning_contents.push(reasoning),
 							ContentPart::Custom(custom_part) if is_thinking_block(&custom_part.data) => {
-								thinking_blocks.push(Some(custom_part.data));
+								thinking_blocks.push(Some(custom_part.data.into()));
 							}
 							other => other_parts.push(other),
 						}
@@ -348,7 +348,7 @@ impl AnthropicAdapter {
 								let input = if tool_call.fn_arguments.is_null() {
 									Value::Object(Map::new())
 								} else {
-									tool_call.fn_arguments
+									tool_call.fn_arguments.into()
 								};
 								// see: https://docs.anthropic.com/en/docs/build-with-claude/tool-use#example-of-successful-tool-result
 								values.push(json!({
@@ -362,7 +362,7 @@ impl AnthropicAdapter {
 							ContentPart::Binary(_) => {}
 							ContentPart::ToolResponse(_) => {}
 							ContentPart::ThoughtSignature(_) | ContentPart::ReasoningContent(_) => {}
-							ContentPart::Custom(custom_part) => values.push(custom_part.data),
+							ContentPart::Custom(custom_part) => values.push(custom_part.data.into()),
 						}
 					}
 
@@ -394,7 +394,7 @@ impl AnthropicAdapter {
 									"tool_use_id": tool_response.call_id,
 								}));
 							}
-							ContentPart::Custom(custom_part) => values.push(custom_part.data),
+							ContentPart::Custom(custom_part) => values.push(custom_part.data.into()),
 							_ => {}
 						}
 					}
@@ -658,7 +658,7 @@ impl AnthropicAdapter {
 					let tool_call = ToolCall {
 						call_id,
 						fn_name,
-						fn_arguments,
+						fn_arguments: fn_arguments.into(),
 						thought_signatures: None,
 					};
 

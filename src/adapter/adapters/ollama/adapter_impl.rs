@@ -168,7 +168,7 @@ impl Adapter for OllamaAdapter {
 				content.push(ToolCall {
 					call_id,
 					fn_name,
-					fn_arguments,
+					fn_arguments: fn_arguments.into(),
 					thought_signatures: None,
 				});
 			}

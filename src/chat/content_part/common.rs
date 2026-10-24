@@ -10,6 +10,7 @@ use std::sync::Arc;
 ///
 /// Variants cover plain text, binary payloads (e.g., images/PDF), and tool calls/responses.
 #[derive(Debug, Clone, Serialize, Deserialize, From)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize))]
 pub enum ContentPart {
 	#[from(String, &String, &str)]
 	Text(String),
@@ -81,7 +82,10 @@ impl ContentPart {
 	}
 
 	pub fn from_custom(data: Value, model_iden: Option<ModelIden>) -> Self {
-		ContentPart::Custom(CustomPart { data, model_iden })
+		ContentPart::Custom(CustomPart {
+			data: data.into(),
+			model_iden,
+		})
 	}
 }
 

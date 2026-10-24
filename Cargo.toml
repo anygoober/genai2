@@ -4,12 +4,12 @@ version = "0.7.2-WIP"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 description = "Multi-AI Providers Library for Rust. (OpenAI, Gemini, Anthropic, DeepSeek, Ollama, OMLX, AWS Bedrock, Vertex, Xai, Groq, Kimi, GLM and many more)"
-keywords = ["generative-ai","openai","anthropic","gemini","ollama"]
+keywords = ["generative-ai", "openai", "anthropic", "gemini", "ollama"]
 homepage = "https://github.com/jeremychone/rust-genai"
 repository = "https://github.com/jeremychone/rust-genai"
 
 [lints.rust]
-unsafe_code = "forbid"
+unsafe_code = "allow"
 # unused = { level = "allow", priority = -1 } # For exploratory dev.
 # missing_docs = "warn"
 
@@ -42,11 +42,7 @@ system-proxy = ["reqwest/system-proxy"]
 #
 # The simpler Bearer-token Bedrock adapter (BEDROCK_API_KEY) is always available — no feature
 # needed — since it has no extra dependencies.
-bedrock-sigv4 = [
-	"dep:aws-config",
-	"dep:aws-credential-types",
-	"dep:aws-sigv4",
-]
+bedrock-sigv4 = ["dep:aws-config", "dep:aws-credential-types", "dep:aws-sigv4"]
 
 # -- Telemetry
 # OpenTelemetry GenAI instrumentation (OFF by default).
@@ -58,17 +54,37 @@ bedrock-sigv4 = [
 # spans; genai records to whatever `tracing` subscriber is installed.
 otel = []
 
+# -- rkyv
+# This is for my project only
+rkyv = ["dep:rkyv"]
+
 [dependencies]
 # -- Async
-tokio = { version = "1", features = ["macros", "rt-multi-thread", "io-std", "test-util", "io-util", "time"]}
+tokio = { version = "1", features = [
+    "macros",
+    "rt-multi-thread",
+    "io-std",
+    "test-util",
+    "io-util",
+    "time",
+] }
 futures = "0.3"
 tokio-stream = "0.1"
 # -- Json
-serde = { version = "1", features = ["derive", "rc"] } # Opted to rc for Arc<T> serialization
+serde = { version = "1", features = [
+    "derive",
+    "rc",
+] } # Opted to rc for Arc<T> serialization
 serde_json = { version = "1", features = ["preserve_order"] }
 serde_with = "3"
 # -- Web
-reqwest = { version = "0.13", default-features = false, features = ["json", "stream", "gzip", "charset", "http2"] }
+reqwest = { version = "0.13", default-features = false, features = [
+    "json",
+    "stream",
+    "gzip",
+    "charset",
+    "http2",
+] }
 bytes = "1.6"
 # -- File
 base64 = "0.23.0"
@@ -90,15 +106,13 @@ aws-config = { version = "1", optional = true }
 aws-credential-types = { version = "1", optional = true }
 aws-sigv4 = { version = "1", optional = true }
 
-# The OTel example references `genai::otel`, so it only builds with the feature on.
-[[example]]
-name = "c12-otel"
-required-features = ["otel"]
+# -- rykv support (optional, `rkyv` feature)
+rkyv = { version = "0.8.18", optional = true }
 
 [dev-dependencies]
 schemars = "1.2.1"
 simple-fs = "0.12"
-tracing-subscriber = {version = "0.3", features = ["env-filter"]}
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 serial_test = "4"
 base64 = "0.23.0"
 bitflags = "2.8"

@@ -119,7 +119,7 @@ impl IxStep {
 			IxStep::FunctionCall { id, name, arguments } => vec![ContentPart::ToolCall(ToolCall {
 				call_id: id,
 				fn_name: name,
-				fn_arguments: arguments,
+				fn_arguments: arguments.into(),
 				thought_signatures: None,
 			})],
 

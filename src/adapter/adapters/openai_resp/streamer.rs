@@ -179,7 +179,7 @@ impl OpenAIRespStreamer {
 					tool_calls.push(ToolCall {
 						call_id,
 						fn_name,
-						fn_arguments,
+						fn_arguments: fn_arguments.into(),
 						thought_signatures: None,
 					});
 				}
@@ -262,7 +262,7 @@ impl futures::Stream for OpenAIRespStreamer {
 								&& !arguments.is_empty()
 							{
 								if let Some(tool_call) = self.in_progress_tool_calls.get_mut(&output_index) {
-									tool_call.fn_arguments = Value::String(arguments.to_string());
+									tool_call.fn_arguments = Value::String(arguments.to_string()).into();
 								} else {
 									self.in_progress_tool_calls
 										.insert(output_index, tool_call_from_item(&item, arguments.to_string()));
@@ -310,7 +310,7 @@ impl futures::Stream for OpenAIRespStreamer {
 							if let Some(tool_call) = self.in_progress_tool_calls.get_mut(&output_index) {
 								if let Some(args) = tool_call.fn_arguments.as_str() {
 									let new_args = format!("{}{}", args, delta);
-									tool_call.fn_arguments = Value::String(new_args);
+									tool_call.fn_arguments = Value::String(new_args).into();
 								}
 
 								let tool_call_to_send = tool_call.clone();
@@ -322,7 +322,7 @@ impl futures::Stream for OpenAIRespStreamer {
 						RespStreamEvent::CustomToolCallInputDelta { output_index, delta } => {
 							if let Some(tool_call) = self.in_progress_tool_calls.get_mut(&output_index) {
 								if let Some(input) = tool_call.fn_arguments.as_str() {
-									tool_call.fn_arguments = Value::String(format!("{input}{delta}"));
+									tool_call.fn_arguments = Value::String(format!("{input}{delta}")).into();
 								}
 								return Poll::Ready(Some(Ok(InterStreamEvent::ToolCallChunk(tool_call.clone()))));
 							}
@@ -468,7 +468,7 @@ fn tool_call_from_item(item: &Value, arguments: String) -> ToolCall {
 	ToolCall {
 		call_id: item.x_get_str("call_id").unwrap_or_default().to_string(),
 		fn_name: item.x_get_str("name").unwrap_or_default().to_string(),
-		fn_arguments: Value::String(arguments),
+		fn_arguments: Value::String(arguments).into(),
 		thought_signatures: None,
 	}
 }

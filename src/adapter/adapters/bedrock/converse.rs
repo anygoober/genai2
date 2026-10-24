@@ -145,7 +145,7 @@ pub(super) fn parse_converse_response(model_iden: ModelIden, web_response: WebRe
 			content.push(ContentPart::ToolCall(ToolCall {
 				call_id,
 				fn_name,
-				fn_arguments,
+				fn_arguments: fn_arguments.into(),
 				thought_signatures: None,
 			}));
 		} else if let Ok(mut reasoning) = item.x_take::<Value>("reasoningContent") {
@@ -473,7 +473,7 @@ fn assistant_content_to_converse_blocks(content: MessageContent, publisher: Bedr
 				let input = if tool_call.fn_arguments.is_null() {
 					Value::Object(Map::new())
 				} else {
-					tool_call.fn_arguments
+					tool_call.fn_arguments.into()
 				};
 				blocks.push(json!({
 					"toolUse": {
@@ -658,7 +658,7 @@ mod tests {
 		ToolCall {
 			call_id: "call_1".to_string(),
 			fn_name: "weather".to_string(),
-			fn_arguments: json!({}),
+			fn_arguments: json!({}).into(),
 			thought_signatures: None,
 		}
 	}

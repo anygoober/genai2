@@ -14,7 +14,7 @@ fn test_openai_resp_cache_control_without_eligible_content_does_not_fail_respons
 	let assistant_msg = ChatMessage::assistant(MessageContent::from_parts(vec![ContentPart::ToolCall(ToolCall {
 		call_id: "call_1".to_string(),
 		fn_name: "get_weather".to_string(),
-		fn_arguments: json!({}),
+		fn_arguments: json!({}).into(),
 		thought_signatures: None,
 	})]))
 	.with_options(CacheControl::Ephemeral);
@@ -38,7 +38,7 @@ fn custom_grammar_tool_and_roundtrip_use_responses_native_items() {
 	let assistant = ChatMessage::assistant(vec![ToolCall {
 		call_id: "call_patch".to_string(),
 		fn_name: "apply_patch".to_string(),
-		fn_arguments: Value::String(patch.to_string()),
+		fn_arguments: Value::String(patch.to_string()).into(),
 		thought_signatures: None,
 	}]);
 	let response = ChatMessage::from(ToolResponse::new("call_patch", "Done!"));
@@ -534,7 +534,7 @@ fn test_openai_resp_into_openai_request_parts_does_not_duplicate_mirrored_though
 		ContentPart::ToolCall(ToolCall {
 			call_id: "call_1".to_string(),
 			fn_name: "get_weather".to_string(),
-			fn_arguments: json!({"city": "Paris"}),
+			fn_arguments: json!({"city": "Paris"}).into(),
 			thought_signatures: Some(vec!["enc_sig_1".to_string()]),
 		}),
 	]);
