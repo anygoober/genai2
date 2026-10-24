@@ -209,6 +209,7 @@ impl From<Vec<ToolResponse>> for ChatMessage {
 
 #[cfg(test)]
 mod tests {
+
 	use super::*;
 	use crate::adapter::{AdapterDispatcher, AdapterKind, ServiceType};
 	use crate::chat::{ChatOptionsSet, ChatRequest};

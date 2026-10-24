@@ -258,9 +258,13 @@ impl CohereAdapter {
 		}
 
 		// -- Build and extract the last user message
-		let last_chat_msg = chat_req.messages.to_mut().pop().ok_or_else(|| Error::ChatReqHasNoMessages {
-			model_iden: model_iden.clone(),
-		})?;
+		let last_chat_msg = chat_req
+			.messages
+			.to_mut()
+			.pop_front()
+			.ok_or_else(|| Error::ChatReqHasNoMessages {
+				model_iden: model_iden.clone(),
+			})?;
 		if !matches!(last_chat_msg.role, ChatRole::User) {
 			return Err(Error::LastChatMessageIsNotUser {
 				model_iden,

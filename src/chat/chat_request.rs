@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::collections::VecDeque;
 
 use crate::chat::{ChatMessage, ChatRole, StreamEnd, Tool, ToolCall, ToolResponse};
 use crate::support;
@@ -7,7 +8,7 @@ use serde_with::skip_serializing_none;
 
 // region:    --- ChatRequest
 
-type Messages<'messages> = Cow<'messages, [ChatMessage]>;
+type Messages<'messages> = Cow<'messages, VecDeque<ChatMessage>>;
 type Tools<'tools> = Cow<'tools, [Tool]>;
 
 /// A provider-neutral chat request containing conversation messages and available tools.
@@ -38,9 +39,13 @@ pub struct ChatRequest<'messages, 'tools> {
 /// Constructors
 impl<'messages, 'tools> ChatRequest<'messages, 'tools> {
 	/// Construct from a set of messages.
-	pub fn new(messages: impl Into<Messages<'messages>>) -> Self {
+	pub fn new<I>(messages: I) -> Self
+	where
+		I: IntoIterator,
+		I::Item: Into<ChatMessage>,
+	{
 		Self {
-			messages: messages.into(),
+			messages: Cow::Owned(messages.into_iter().map(Into::into).collect()),
 			system: None,
 			tools: None,
 			previous_response_id: None,
@@ -63,7 +68,7 @@ impl<'messages, 'tools> ChatRequest<'messages, 'tools> {
 	pub fn from_user(content: impl Into<String>) -> Self {
 		Self {
 			system: None,
-			messages: vec![ChatMessage::user(content.into())].into(),
+			messages: Cow::Owned(VecDeque::from(vec![ChatMessage::user(content.into())])),
 			tools: None,
 			previous_response_id: None,
 			store: None,
@@ -92,7 +97,7 @@ impl<'messages, 'tools> ChatRequest<'messages, 'tools> {
 
 	/// Append one message.
 	pub fn append_message(mut self, msg: impl Into<ChatMessage>) -> Self {
-		self.messages.to_mut().push(msg.into());
+		self.messages.to_mut().push_back(msg.into());
 		self
 	}
 
@@ -142,19 +147,19 @@ impl<'messages, 'tools> ChatRequest<'messages, 'tools> {
 			if !content.contains_reasoning_content() {
 				assistant = assistant.with_reasoning_content(end.captured_reasoning_content.clone());
 			}
-			self.messages.to_mut().push(assistant);
+			self.messages.to_mut().push_back(assistant);
 		} else if let Some(calls_ref) = end.captured_tool_calls() {
 			// Fallback: build assistant message from tool calls only
 			let calls: Vec<ToolCall> = calls_ref.into_iter().cloned().collect();
 			if !calls.is_empty() {
 				self.messages
 					.to_mut()
-					.push(ChatMessage::from(calls).with_reasoning_content(end.captured_reasoning_content.clone()));
+					.push_back(ChatMessage::from(calls).with_reasoning_content(end.captured_reasoning_content.clone()));
 			}
 		}
 
 		// Append the tool response turn
-		self.messages.to_mut().push(ChatMessage::from(tool_response));
+		self.messages.to_mut().push_back(ChatMessage::from(tool_response));
 		self
 	}
 }
@@ -196,7 +201,7 @@ impl From<Vec<ChatMessage>> for ChatRequest<'_, '_> {
 	fn from(messages: Vec<ChatMessage>) -> Self {
 		Self {
 			system: None,
-			messages: messages.into(),
+			messages: Cow::Owned(VecDeque::from(messages)),
 			tools: None,
 			previous_response_id: None,
 			store: None,

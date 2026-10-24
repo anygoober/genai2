@@ -14,7 +14,7 @@ use crate::webc::{EventSourceStream, WebClient, WebResponse};
 use crate::{Error, Headers, Result};
 use crate::{ModelIden, ServiceTarget};
 use serde_json::{Map, Value, json};
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 use value_ext::JsonValueExt;
 
 pub struct GeminiIxAdapter;
@@ -378,7 +378,7 @@ impl Adapter for GeminiIxAdapter {
 impl GeminiIxAdapter {
 	fn into_ix_input_steps(
 		model_iden: &ModelIden,
-		messages: Vec<ChatMessage>,
+		messages: VecDeque<ChatMessage>,
 		systems: &mut Vec<String>,
 	) -> Result<Vec<Value>> {
 		let mut steps: Vec<Value> = Vec::new();
