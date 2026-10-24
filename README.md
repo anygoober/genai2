@@ -1,3 +1,11 @@
+# genai2
+
+Originally [jeremychone/rust-genai](https://github.com/jeremychone/rust-genai) but with some memory optimizations I need. I love forking people's repositories for no reason.
+
+The original README is as follows. But note that examples/tests are deleted because I'm too lazy to refine them to fit the new changes. That said, this is only for personal use, and it's not going to be on crates.io whatsoever.
+
+***
+
 # genai
 
 **A Native-Protocol Multi-AI Provider Library for Rust**
