@@ -1,5 +1,5 @@
 [package]
-name = "genai"
+name = "genai2"
 version = "0.7.2-WIP"
 edition = "2024"
 license = "MIT OR Apache-2.0"
