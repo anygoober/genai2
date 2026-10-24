@@ -81,7 +81,7 @@ impl OllamaAdapter {
 		}
 
 		// -- Messages
-		for msg in chat_req.messages {
+		for msg in chat_req.messages.into_owned() {
 			let mut ollama_msg = json!({
 				"role": msg.role.to_string().to_lowercase(),
 			});
@@ -133,7 +133,13 @@ impl OllamaAdapter {
 		// -- Tools
 		let tools = chat_req
 			.tools
-			.map(|tools| tools.into_iter().map(Self::tool_to_ollama_tool).collect::<Result<Vec<Value>>>())
+			.map(|tools| {
+				tools
+					.into_owned()
+					.into_iter()
+					.map(Self::tool_to_ollama_tool)
+					.collect::<Result<Vec<Value>>>()
+			})
 			.transpose()?;
 
 		Ok(OllamaRequestParts { messages, tools })

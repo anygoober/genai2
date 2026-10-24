@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use crate::chat::{ChatMessage, ChatRole, StreamEnd, Tool, ToolCall, ToolResponse};
 use crate::support;
 use serde::{Deserialize, Serialize};
@@ -5,19 +7,22 @@ use serde_with::skip_serializing_none;
 
 // region:    --- ChatRequest
 
+type Messages<'messages> = Cow<'messages, [ChatMessage]>;
+type Tools<'tools> = Cow<'tools, [Tool]>;
+
 /// A provider-neutral chat request containing conversation messages and available tools.
 #[skip_serializing_none]
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct ChatRequest {
+pub struct ChatRequest<'messages, 'tools> {
 	/// The initial system content of the request.
 	pub system: Option<String>,
 
 	/// The messages of the request.
-	#[serde(default)]
-	pub messages: Vec<ChatMessage>,
+	#[serde(default, borrow)]
+	pub messages: Messages<'messages>,
 
 	/// Optional tool definitions available to the model.
-	pub tools: Option<Vec<Tool>>,
+	pub tools: Option<Tools<'tools>>,
 
 	/// Previous response ID used to continue a provider-managed stateful session.
 	#[serde(default, skip_serializing_if = "Option::is_none")]
@@ -31,11 +36,11 @@ pub struct ChatRequest {
 }
 
 /// Constructors
-impl ChatRequest {
+impl<'messages, 'tools> ChatRequest<'messages, 'tools> {
 	/// Construct from a set of messages.
-	pub fn new(messages: Vec<ChatMessage>) -> Self {
+	pub fn new(messages: impl Into<Messages<'messages>>) -> Self {
 		Self {
-			messages,
+			messages: messages.into(),
 			system: None,
 			tools: None,
 			previous_response_id: None,
@@ -47,7 +52,7 @@ impl ChatRequest {
 	pub fn from_system(content: impl Into<String>) -> Self {
 		Self {
 			system: Some(content.into()),
-			messages: Vec::new(),
+			messages: Default::default(),
 			tools: None,
 			previous_response_id: None,
 			store: None,
@@ -58,7 +63,7 @@ impl ChatRequest {
 	pub fn from_user(content: impl Into<String>) -> Self {
 		Self {
 			system: None,
-			messages: vec![ChatMessage::user(content.into())],
+			messages: vec![ChatMessage::user(content.into())].into(),
 			tools: None,
 			previous_response_id: None,
 			store: None,
@@ -66,10 +71,10 @@ impl ChatRequest {
 	}
 
 	/// Construct from messages.
-	pub fn from_messages(messages: Vec<ChatMessage>) -> Self {
+	pub fn from_messages(messages: impl Into<Messages<'messages>>) -> Self {
 		Self {
 			system: None,
-			messages,
+			messages: messages.into(),
 			tools: None,
 			previous_response_id: None,
 			store: None,
@@ -78,7 +83,7 @@ impl ChatRequest {
 }
 
 /// Chainable Setters
-impl ChatRequest {
+impl<'messages, 'tools> ChatRequest<'messages, 'tools> {
 	/// Set or replace the system prompt.
 	pub fn with_system(mut self, system: impl Into<String>) -> Self {
 		self.system = Some(system.into());
@@ -87,7 +92,7 @@ impl ChatRequest {
 
 	/// Append one message.
 	pub fn append_message(mut self, msg: impl Into<ChatMessage>) -> Self {
-		self.messages.push(msg.into());
+		self.messages.to_mut().push(msg.into());
 		self
 	}
 
@@ -97,17 +102,13 @@ impl ChatRequest {
 		I: IntoIterator,
 		I::Item: Into<ChatMessage>,
 	{
-		self.messages.extend(messages.into_iter().map(Into::into));
+		self.messages.to_mut().extend(messages.into_iter().map(Into::into));
 		self
 	}
 
 	/// Replace the tool set.
-	pub fn with_tools<I>(mut self, tools: I) -> Self
-	where
-		I: IntoIterator,
-		I::Item: Into<Tool>,
-	{
-		self.tools = Some(tools.into_iter().map(Into::into).collect());
+	pub fn with_tools(mut self, tools: impl Into<Tools<'tools>>) -> Self {
+		self.tools = Some(tools.into());
 		self
 	}
 
@@ -125,7 +126,7 @@ impl ChatRequest {
 
 	/// Append one tool.
 	pub fn append_tool(mut self, tool: impl Into<Tool>) -> Self {
-		self.tools.get_or_insert_with(Vec::new).push(tool.into());
+		self.tools.get_or_insert_with(Default::default).to_mut().push(tool.into());
 		self
 	}
 
@@ -141,24 +142,25 @@ impl ChatRequest {
 			if !content.contains_reasoning_content() {
 				assistant = assistant.with_reasoning_content(end.captured_reasoning_content.clone());
 			}
-			self.messages.push(assistant);
+			self.messages.to_mut().push(assistant);
 		} else if let Some(calls_ref) = end.captured_tool_calls() {
 			// Fallback: build assistant message from tool calls only
 			let calls: Vec<ToolCall> = calls_ref.into_iter().cloned().collect();
 			if !calls.is_empty() {
 				self.messages
+					.to_mut()
 					.push(ChatMessage::from(calls).with_reasoning_content(end.captured_reasoning_content.clone()));
 			}
 		}
 
 		// Append the tool response turn
-		self.messages.push(ChatMessage::from(tool_response));
+		self.messages.to_mut().push(ChatMessage::from(tool_response));
 		self
 	}
 }
 
 /// Getters
-impl ChatRequest {
+impl ChatRequest<'_, '_> {
 	/// Iterate over all system content: the top-level system prompt, then any system-role messages.
 	pub fn iter_systems(&self) -> impl Iterator<Item = &str> {
 		self.system
@@ -190,11 +192,11 @@ impl ChatRequest {
 	}
 }
 
-impl From<Vec<ChatMessage>> for ChatRequest {
+impl From<Vec<ChatMessage>> for ChatRequest<'_, '_> {
 	fn from(messages: Vec<ChatMessage>) -> Self {
 		Self {
 			system: None,
-			messages,
+			messages: messages.into(),
 			tools: None,
 			previous_response_id: None,
 			store: None,

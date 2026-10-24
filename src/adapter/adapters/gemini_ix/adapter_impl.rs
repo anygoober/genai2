@@ -181,7 +181,7 @@ impl Adapter for GeminiIxAdapter {
 		if let Some(system) = system {
 			systems.push(system);
 		}
-		let input_steps = Self::into_ix_input_steps(&model, messages, &mut systems)?;
+		let input_steps = Self::into_ix_input_steps(&model, messages.into_owned(), &mut systems)?;
 
 		let store = explicit_store.unwrap_or(true);
 		if previous_response_id.is_some() && explicit_store == Some(false) {
@@ -210,7 +210,7 @@ impl Adapter for GeminiIxAdapter {
 
 		// -- Tools (interaction-scoped)
 		if let Some(tools) = tools {
-			payload.x_insert("tools", Self::into_ix_tools(tools))?;
+			payload.x_insert("tools", Self::into_ix_tools(tools.into_owned()))?;
 		}
 
 		// -- Input steps

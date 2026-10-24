@@ -625,7 +625,7 @@ impl GeminiAdapter {
 		}
 
 		// -- Build
-		for msg in chat_req.messages {
+		for msg in chat_req.messages.into_owned() {
 			for call in msg.content.tool_calls() {
 				call_names.insert(call.call_id.clone(), call.fn_name.clone());
 			}
@@ -734,7 +734,7 @@ impl GeminiAdapter {
 			// Note: This is to add only one function_declarations in the tools as per the gemini spec
 			//       The rest are builtins
 			let mut function_declarations: Vec<Value> = Vec::new();
-			for req_tool in req_tools {
+			for req_tool in req_tools.into_owned() {
 				match Self::tool_to_gemini_tool(req_tool)? {
 					GeminiTool::Builtin(value) => tools.push(value),
 					GeminiTool::User(value) => function_declarations.push(value),

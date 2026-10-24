@@ -487,7 +487,7 @@ fn test_anthropic_tool_cache_control_serialized_on_anthropic_payload() {
 		.with_description("Get the latest news")
 		.with_schema(json!({"type": "object", "properties": {}}));
 
-	let chat_req = ChatRequest::from_user("hello").with_tools([ephemeral_tool, one_hour_tool, plain_tool]);
+	let chat_req = ChatRequest::from_user("hello").with_tools(vec![ephemeral_tool, one_hour_tool, plain_tool]);
 
 	let target = ServiceTarget {
 		endpoint: AnthropicAdapter::default_endpoint(AdapterKind::Anthropic),
@@ -557,7 +557,7 @@ fn test_anthropic_request_level_cache_control_auto_breakpoint_on_system() {
 fn test_anthropic_request_level_cache_control_falls_back_to_last_tool_when_no_system() {
 	let tool_a = Tool::new("a").with_schema(json!({"type": "object", "properties": {}}));
 	let tool_b = Tool::new("b").with_schema(json!({"type": "object", "properties": {}}));
-	let chat_req = ChatRequest::from_user("hello").with_tools([tool_a, tool_b]);
+	let chat_req = ChatRequest::from_user("hello").with_tools(vec![tool_a, tool_b]);
 	let chat_options = ChatOptions::default().with_cache_control(CacheControl::Ephemeral);
 	let options_set = ChatOptionsSet::default().with_chat_options(Some(&chat_options));
 	let target = ServiceTarget {

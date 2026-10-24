@@ -315,7 +315,7 @@ impl OpenAIAdapter {
 		}
 
 		// -- Process the messages
-		for msg in chat_req.messages {
+		for msg in chat_req.messages.into_owned() {
 			let cache_controlled = cache_policy.is_some()
 				&& msg
 					.options
@@ -515,6 +515,7 @@ impl OpenAIAdapter {
 		// -- Process the tools
 		let tools = chat_req.tools.map(|tools| {
 			tools
+				.into_owned()
 				.into_iter()
 				.map(|tool| {
 					let strict = tool.strict.unwrap_or(false);

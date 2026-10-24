@@ -428,7 +428,7 @@ impl OpenAIRespAdapter {
 		let mut input_items: Vec<Value> = Vec::new();
 		let custom_tool_names = chat_req
 			.tools
-			.as_ref()
+			.as_deref()
 			.into_iter()
 			.flatten()
 			.filter(|tool| tool.custom_format.is_some())
@@ -444,7 +444,7 @@ impl OpenAIRespAdapter {
 		let mut unamed_file_count = 0;
 
 		// -- Process the messages
-		for msg in chat_req.messages {
+		for msg in chat_req.messages.into_owned() {
 			let cache_controlled = cache_policy.is_some()
 				&& msg
 					.options
@@ -676,7 +676,13 @@ impl OpenAIRespAdapter {
 		// -- Process the tools
 		let tools = chat_req
 			.tools
-			.map(|tools| tools.into_iter().map(Self::tool_to_openai_tool).collect::<Result<Vec<Value>>>())
+			.map(|tools| {
+				tools
+					.into_owned()
+					.into_iter()
+					.map(Self::tool_to_openai_tool)
+					.collect::<Result<Vec<Value>>>()
+			})
 			.transpose()?;
 
 		Ok(OpenAIRespRequestParts { input_items, tools })

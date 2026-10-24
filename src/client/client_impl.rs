@@ -90,7 +90,7 @@ impl Client {
 	pub async fn exec_chat(
 		&self,
 		model: impl Into<ModelSpec>,
-		chat_req: ChatRequest,
+		chat_req: ChatRequest<'_, '_>,
 		options: Option<&ChatOptions>,
 	) -> Result<ChatResponse> {
 		let options_set = ChatOptionsSet::default()
@@ -178,7 +178,7 @@ impl Client {
 	pub async fn exec_chat_stream(
 		&self,
 		model: impl Into<ModelSpec>,
-		chat_req: ChatRequest,
+		chat_req: ChatRequest<'_, '_>,
 		options: Option<&ChatOptions>,
 	) -> Result<ChatStreamResponse> {
 		let options_set = ChatOptionsSet::default()

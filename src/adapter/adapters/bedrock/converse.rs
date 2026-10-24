@@ -337,7 +337,7 @@ fn into_converse_request_parts(chat_req: ChatRequest, publisher: BedrockPublishe
 		systems.push(system);
 	}
 
-	for msg in chat_req.messages {
+	for msg in chat_req.messages.into_owned() {
 		match msg.role {
 			ChatRole::System => {
 				if let Some(text) = msg.content.joined_texts() {
@@ -376,7 +376,13 @@ fn into_converse_request_parts(chat_req: ChatRequest, publisher: BedrockPublishe
 
 	let tools: Option<Vec<Value>> = chat_req
 		.tools
-		.map(|tools| tools.into_iter().map(tool_to_converse_tool).collect::<Result<Vec<Value>>>())
+		.map(|tools| {
+			tools
+				.into_owned()
+				.into_iter()
+				.map(tool_to_converse_tool)
+				.collect::<Result<Vec<Value>>>()
+		})
 		.transpose()?;
 
 	Ok(ConverseRequestParts {

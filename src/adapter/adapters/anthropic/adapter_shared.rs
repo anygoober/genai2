@@ -144,7 +144,7 @@ impl AnthropicAdapter {
 		let mut has_msg_cache = false;
 
 		// -- Process the messages
-		for msg in chat_req.messages {
+		for msg in chat_req.messages.into_owned() {
 			let cache_control = msg.options.and_then(|o| o.cache_control);
 			// Any explicit message cache_control (incl. System-role, part of the static prefix)
 			// counts as a breakpoint; request-level placement (below) defers to it.
@@ -418,7 +418,7 @@ impl AnthropicAdapter {
 			if !has_msg_cache && !has_tool_cache {
 				if let Some(last_system) = systems.last_mut() {
 					last_system.1 = Some(req_cc);
-				} else if let Some(last_tool) = chat_req.tools.as_mut().and_then(|tools| tools.last_mut()) {
+				} else if let Some(last_tool) = chat_req.tools.as_mut().and_then(|tools| tools.to_mut().last_mut()) {
 					last_tool.cache_control = Some(req_cc);
 				}
 			}
@@ -458,6 +458,7 @@ impl AnthropicAdapter {
 			.tools
 			.map(|tools| {
 				tools
+					.into_owned()
 					.into_iter()
 					.map(Self::tool_to_anthropic_tool)
 					.collect::<Result<Vec<Value>>>()

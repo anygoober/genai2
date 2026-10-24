@@ -258,7 +258,7 @@ impl CohereAdapter {
 		}
 
 		// -- Build and extract the last user message
-		let last_chat_msg = chat_req.messages.pop().ok_or_else(|| Error::ChatReqHasNoMessages {
+		let last_chat_msg = chat_req.messages.to_mut().pop().ok_or_else(|| Error::ChatReqHasNoMessages {
 			model_iden: model_iden.clone(),
 		})?;
 		if !matches!(last_chat_msg.role, ChatRole::User) {
@@ -277,7 +277,7 @@ impl CohereAdapter {
 		};
 
 		// -- Build
-		for msg in chat_req.messages {
+		for msg in chat_req.messages.into_owned() {
 			let Some(content) = msg.content.into_joined_texts() else {
 				return Err(Error::MessageContentTypeNotSupported {
 					model_iden,
