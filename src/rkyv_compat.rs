@@ -1,67 +1,8 @@
-#[repr(transparent)]
-#[derive(Clone, serde::Serialize, Hash, Eq, PartialEq)]
-pub struct StaticStr {
-	inner: &'static str,
-}
-
-impl From<&'static str> for StaticStr {
-	fn from(value: &'static str) -> Self {
-		Self { inner: value }
-	}
-}
-
-impl core::fmt::Debug for StaticStr {
-	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		write!(f, "{:?}", self.inner)
-	}
-}
-
-impl core::ops::Deref for StaticStr {
-	type Target = str;
-	fn deref(&self) -> &Self::Target {
-		self.inner
-	}
-}
-
 // This is shown in the example
 // https://docs.rs/rkyv/latest/rkyv/trait.Archive.html#examples
 //
 // I think we'll only need Serialize only.
 // Deserializing is basically leaking memory lol
-#[cfg(feature = "rkyv")]
-mod archive_static_str {
-	use super::StaticStr;
-	use rkyv::{RelPtr, SerializeUnsized, rancor::Fallible, ser::Writer};
-
-	#[repr(transparent)]
-	#[derive(rkyv::Portable)]
-	pub struct ArchivedStaticStr {
-		ptr: RelPtr<str>,
-	}
-
-	pub struct StaticStrResolver {
-		pos: usize,
-	}
-
-	impl rkyv::Archive for StaticStr {
-		type Archived = ArchivedStaticStr;
-		type Resolver = StaticStrResolver;
-
-		fn resolve(&self, resolver: Self::Resolver, out: rkyv::Place<Self::Archived>) {
-			use rkyv::ArchiveUnsized;
-			rkyv::munge::munge!(let ArchivedStaticStr { ptr } = out);
-			RelPtr::emplace_unsized(resolver.pos, self.inner.archived_metadata(), ptr);
-		}
-	}
-
-	impl<S: Fallible + Writer + ?Sized> rkyv::Serialize<S> for StaticStr {
-		fn serialize(&self, serializer: &mut S) -> Result<Self::Resolver, S::Error> {
-			Ok(StaticStrResolver {
-				pos: self.inner.serialize_unsized(serializer)?,
-			})
-		}
-	}
-}
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[repr(transparent)]
