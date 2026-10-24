@@ -99,7 +99,7 @@ let tool = Tool::new("get_weather")
 
 // 2. Add it to the request
 let chat_req = ChatRequest::from_user("What is the weather in Paris?")
-    .with_tools([tool]);
+    .with_tools(vec![tool]);
 
 // 3. Execute chat (omitted client setup)
 let response = client.exec_chat(model, chat_req, None).await?;
@@ -111,4 +111,3 @@ if let Some(tool_call) = response.tool_calls().first() {
 ```
 
 For built-in provider tools, the normalized API can also use typed names and configs, for example `Tool::new_web_search()` together with `ToolConfig::WebSearch(...)`.
-
